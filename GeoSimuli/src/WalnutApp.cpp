@@ -30,7 +30,8 @@ public:
 		ImGui::Separator();
 
 		ImGui::BeginChild("Settings");
-		ImGui::Text("Settings information will \n also be here");
+		ImGui::Text("Settings information will \n also be here \n \n Example: \n");
+		ImGui::InputInt("Number", m_IntPtr, 1, 100);
 		ImGui::EndChild();
 		
 		ImGui::End();
@@ -74,6 +75,7 @@ private:
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 	uint32_t m_ProjectWidth = 0, m_ProjectHeight = 0;
+	int* m_IntPtr = new int(1);
 };
 
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
@@ -87,10 +89,14 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Exit"))
+			if (ImGui::MenuItem("Exit", "Ctrl+Q"))
 			{
 				app->Close();
 			}
+			ImGui::MenuItem("Save File", "Ctrl+S");
+			ImGui::MenuItem("Load File", "Ctrl+O");
+			ImGui::MenuItem("Export", "Ctrl+E");
+			ImGui::MenuItem("Import Topology", "Ctrl+Alt+E");
 			ImGui::EndMenu();
 		}
 	});
