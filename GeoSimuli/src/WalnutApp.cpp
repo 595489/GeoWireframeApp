@@ -10,31 +10,104 @@ class ExampleLayer : public Walnut::Layer
 public:
 	virtual void OnUIRender() override
 	{
+		// ImGui::ShowDemoWindow();
+
+		// ImGui::Begin("Menu");
+		ImGui::BeginMainMenuBar();
+		if (ImGui::BeginMenu("File"))
+		{
+			ImGui::MenuItem("Save File", "Ctrl+S");
+			ImGui::MenuItem("Load File", "Ctrl+O");
+			ImGui::MenuItem("Export", "Ctrl+E");
+			ImGui::MenuItem("Import Topology", "Ctrl+Alt+E", &m_importWindowEnabled);
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("View"))
+		{
+			if (ImGui::MenuItem("Toolbar"))
+			{
+				m_toolbarEnabled = !m_toolbarEnabled;
+			}
+			if (ImGui::MenuItem("Project Menu"))
+			{
+				m_projectEnabled = !m_projectEnabled;
+			}
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+		//ImGui::End();
+
+		if (m_importWindowEnabled)
+			ImGui::OpenPopup("Import");
+		
+		if (ImGui::BeginPopup("Import"))
+		{
+			ImGui::BeginTabBar("Import...");
+			ImGui::TabItemButton("Import...");
+			ImGui::EndTabBar();
+			ImGui::Text("Import Topology");
+			ImGui::RadioButton("Scan", true);
+			ImGui::SameLine(200.0f, -1.0f);
+			ImGui::RadioButton("GIS format", false);
+			ImGui::SameLine(400.0f, -1.0f);
+			ImGui::RadioButton("Map", false);
+			ImGui::InputInt("Number", m_IntPtr, 1, 100);
+			if (ImGui::Button("Cancel"))
+			{
+				m_importWindowEnabled = false;
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine(400.0f, -1.0f);
+			if (ImGui::Button("Import"))
+			{
+				m_importWindowEnabled = false;
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		
+
 		ImGui::Begin("TopBar");
+
 		if (ImGui::Button("Run"))
 		{
 			Render();
 		}
+		// ImGui::SameLine(100.0f, -1.0f);
+		// ImGui::Button("Test");
+
 		ImGui::End();
 
+		if (m_toolbarEnabled)
+		{
+			ImGui::Begin("Toolbar");
+			ImGui::SmallButton("Trees");
+			ImGui::SmallButton("Bushes");
+			ImGui::SmallButton("Ground");
+			ImGui::End();
+		}
 
-		ImGui::Begin("Project");
+		if (m_projectEnabled)
+		{
+			ImGui::Begin("Project");
 
-		m_ProjectWidth = ImGui::GetContentRegionAvail().x;
-		m_ProjectHeight = ImGui::GetContentRegionAvail().y;
+			m_ProjectWidth = ImGui::GetContentRegionAvail().x;
+			m_ProjectHeight = ImGui::GetContentRegionAvail().y;
 
-		ImGui::BeginChild("Items", { (float)m_ProjectWidth , (float)(m_ProjectHeight / 2) });
-		ImGui::Text("This will hold items \n that have been added \n to the project");
-		ImGui::EndChild();
+			ImGui::BeginChild("Items", { (float)m_ProjectWidth , (float)(m_ProjectHeight / 2) });
+			ImGui::Text("This will hold items \n that have been added \n to the project");
+			ImGui::EndChild();
 
-		ImGui::Separator();
+			ImGui::Separator();
 
-		ImGui::BeginChild("Settings");
-		ImGui::Text("Settings information will \n also be here \n \n Example: \n");
-		ImGui::InputInt("Number", m_IntPtr, 1, 100);
-		ImGui::EndChild();
-		
-		ImGui::End();
+			ImGui::BeginChild("Settings");
+			ImGui::Text("Settings information will \nbe here \n \n Example: \n");
+			ImGui::InputInt("Number", m_IntPtr, 1, 100);
+			ImGui::EndChild();
+
+			ImGui::End();
+		}
 
 		// Viewport, where image shows up
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -76,6 +149,9 @@ private:
 
 	uint32_t m_ProjectWidth = 0, m_ProjectHeight = 0;
 	int* m_IntPtr = new int(1);
+	bool m_toolbarEnabled = true;
+	bool m_projectEnabled = true;
+	bool m_importWindowEnabled = false;
 };
 
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
@@ -85,20 +161,25 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 
 	Walnut::Application* app = new Walnut::Application(spec);
 	app->PushLayer<ExampleLayer>();
-	app->SetMenubarCallback([app]()
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("Exit", "Ctrl+Q"))
-			{
-				app->Close();
-			}
-			ImGui::MenuItem("Save File", "Ctrl+S");
-			ImGui::MenuItem("Load File", "Ctrl+O");
-			ImGui::MenuItem("Export", "Ctrl+E");
-			ImGui::MenuItem("Import Topology", "Ctrl+Alt+E");
-			ImGui::EndMenu();
-		}
-	});
+	// app->SetMenubarCallback([app]()
+	// {
+	// 	if (ImGui::BeginMenu("File"))
+	// 	{
+	// 		if (ImGui::MenuItem("Exit", "Ctrl+Q"))
+	// 		{
+	// 			app->Close();
+	// 		}
+	// 		ImGui::MenuItem("Save File", "Ctrl+S");
+	// 		ImGui::MenuItem("Load File", "Ctrl+O");
+	// 		ImGui::MenuItem("Export", "Ctrl+E");
+	// 		ImGui::MenuItem("Import Topology", "Ctrl+Alt+E");
+	// 		ImGui::EndMenu();
+	// 	}
+	// 	if (ImGui::BeginMenu("View"))
+	// 	{
+	// 		ImGui::MenuItem("Test");
+	// 		ImGui::EndMenu();
+	// 	}
+	// });
 	return app;
 }
